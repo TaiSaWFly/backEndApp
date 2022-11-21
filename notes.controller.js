@@ -23,12 +23,19 @@ async function getNotes() {
   return Array.isArray(JSON.parse(notes)) ? JSON.parse(notes) : [];
 }
 
+async function replaceNote(id, data) {
+  const notes = await getNotes();
+  const noteIndex = notes.findIndex((note) => note.id === id);
+  notes[noteIndex] = { ...notes[noteIndex], ...data };
+  await fs.writeFile(notesPath, JSON.stringify(notes));
+}
+
 async function removeNoteById(id) {
   const notes = await getNotes();
-  const findIndexNote = notes.findIndex((note) => Number(note.id) === id);
+  const findIndexNote = notes.findIndex((note) => note.id === id);
 
   if (findIndexNote !== -1) {
-    const notesWithRemovedId = notes.filter((note) => Number(note.id) !== id);
+    const notesWithRemovedId = notes.filter((note) => note.id !== id);
     await fs.writeFile(notesPath, JSON.stringify(notesWithRemovedId));
     console.log(chalk.bgRedBright(`Note id:${id} was removed!`));
   } else {
@@ -47,6 +54,8 @@ async function printNones() {
 
 module.exports = {
   addNote,
+  getNotes,
+  replaceNote,
   removeNoteById,
   printNones,
 };
